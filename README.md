@@ -116,6 +116,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📧 Contact
 
-**Aoun Raza** - [LinkedIn Profile](https://www.linkedin.com/in/aoun-raza-62507826a/)
+**Aoun Raza** - [LinkedIn Profile](www.linkedin.com/in/aoun-raza-is-cool)
 
 Project Link: [https://github.com/Aouni19/Pulsar](https://github.com/Aouni19/Pulsar)
