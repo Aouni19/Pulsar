@@ -12,7 +12,7 @@
     <a href="#-features"><strong>Explore Features »</strong></a>
     <br />
     <br />
-    <a href="#-download">Download APK</a>
+    <a href="https://github.com/Aouni19/Pulsar/releases/tag/v1.0.0">Download APK</a>
     ·
     <a href="https://github.com/Aouni19/Pulsar/issues">Report Bug</a>
     ·
