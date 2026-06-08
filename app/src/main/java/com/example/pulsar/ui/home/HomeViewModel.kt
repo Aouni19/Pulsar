@@ -18,13 +18,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
+import android.media.MediaMetadataRetriever
 import com.example.pulsar.data.model.DownloadStatus
-import androidx.work.WorkInfo
 
 data class RecentDownloadItem(
     val id: String,
     val title: String,
     val quality: String,
+    val size: String,
+    val runtime: String,
     val status: DownloadStatus,
     val thumbnailUrl: String,
     val filePath: String? = null
@@ -56,17 +60,50 @@ class HomeViewModel @Inject constructor(
 
     val recentDownloadsFlow = downloadDao.getAllDownloads()
         .map { records ->
-            records.take(10).map { record ->
+            records.filter { it.isRecent }.take(10).map { record ->
+                var sizeMb = "-- MB"
+                var runtime = "--:--"
+
+                val file = record.filePath.takeIf { it.isNotBlank() }?.let { java.io.File(it) }
+                if (file?.exists() == true) {
+                    // Calculate size
+                    sizeMb = String.format(java.util.Locale.getDefault(), "%.1f MB", file.length() / (1024f * 1024f))
+                    
+                    // Extract duration
+                    try {
+                        val retriever = MediaMetadataRetriever()
+                        retriever.setDataSource(file.absolutePath)
+                        val timeStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                        val timeMs = timeStr?.toLongOrNull() ?: 0L
+                        if (timeMs > 0) {
+                            val totalSecs = timeMs / 1000
+                            val h = totalSecs / 3600
+                            val m = (totalSecs % 3600) / 60
+                            val s = totalSecs % 60
+                            runtime = if (h > 0) {
+                                String.format(java.util.Locale.getDefault(), "%d:%02d:%02d", h, m, s)
+                            } else {
+                                String.format(java.util.Locale.getDefault(), "%02d:%02d", m, s)
+                            }
+                        }
+                        retriever.release()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
                 RecentDownloadItem(
                     id = record.workId,
                     title = record.title,
                     quality = "Media",
+                    size = sizeMb,
+                    runtime = runtime,
                     status = record.status,
                     thumbnailUrl = record.thumbnailUrl,
                     filePath = record.filePath
                 )
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     fun fetchVideo(url: String) {
         if (url.isBlank()) {
@@ -92,6 +129,12 @@ class HomeViewModel @Inject constructor(
 
     fun resetState() {
         _uiState.value = HomeUiState.Idle
+    }
+
+    fun clearRecentDownloads() {
+        viewModelScope.launch(Dispatchers.IO) {
+            downloadDao.clearRecentHistory()
+        }
     }
 
     fun startDownload(url: String, title: String, formatId: String, isAudio: Boolean, isVideoOnly: Boolean = false, quality: String, thumbnailUrl: String = "") {

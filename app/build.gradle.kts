@@ -3,18 +3,17 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.example.pulsar"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.example.pulsar"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -49,23 +48,14 @@ android {
         compose = true
     }
 
-    defaultConfig {
-        applicationId = "com.example.pulsar"
-        minSdk = 26
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        ndk {
-            // Filter ABIs to reduce APK size.
-            // arm64-v8a covers almost all modern physical Android devices (64-bit).
-            // Removing armeabi-v7a saves ~45MB of native library bloat (ffmpeg, python, etc).
-            abiFilters.addAll(listOf("arm64-v8a"))
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a")
+            isUniversalApk = false
         }
     }
-
-
 }
 
 dependencies {
@@ -82,6 +72,13 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    implementation("androidx.compose.material3:material3:1.4.0")
+    implementation("androidx.compose.material3:material3-window-size-class:1.4.0")
+    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.5.0-alpha21")
+
+    // Use Material Components (Android Views) for native connected button group
+    implementation("com.google.android.material:material:1.9.0")
 
     // --- 2. Room ---
     implementation(libs.room.runtime)

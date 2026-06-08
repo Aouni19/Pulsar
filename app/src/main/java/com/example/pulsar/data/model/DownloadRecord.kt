@@ -15,5 +15,6 @@ data class DownloadRecord(
     val status: DownloadStatus = DownloadStatus.QUEUED,
     val progress: Int = 0, // 0 to 100
     val speed: String = "", // e.g., "1.2 MB/s"
-    val eta: String = "" // e.g., "00:02:30"
+    val eta: String = "", // e.g., "00:02:30"
+    val isRecent: Boolean = true
 )

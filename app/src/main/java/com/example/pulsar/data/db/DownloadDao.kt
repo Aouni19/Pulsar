@@ -33,4 +33,13 @@ interface DownloadDao {
 
     @Query("SELECT * FROM downloads WHERE workId = :workId")
     suspend fun getDownloadByWorkId(workId: String): DownloadRecord?
+
+    @Query("DELETE FROM downloads WHERE workId = :workId")
+    suspend fun deleteByWorkId(workId: String): Int
+
+    @Query("UPDATE downloads SET isRecent = 0")
+    suspend fun clearRecentHistory(): Int
+
+    @Query("DELETE FROM downloads")
+    suspend fun deleteAll(): Int
 }

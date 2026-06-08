@@ -25,7 +25,7 @@ object DatabaseModule {
             context,
             PulsarDatabase::class.java,
             "pulsar_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     // Provides the DAO whenever a ViewModel or Worker asks for it

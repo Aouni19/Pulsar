@@ -32,8 +32,6 @@ import androidx.compose.animation.SharedTransitionScope
 import com.example.pulsar.R
 import com.example.pulsar.ui.theme.bouncyClick
 
-import com.example.pulsar.ui.components.MorphingSegmentedButton
-
 /**
  * Displays the application settings screen, allowing users to configure download preferences,
  * appearance, and advanced options.
@@ -88,7 +86,6 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- DOWNLOADS SECTION ---
             SettingsSectionHeader("Downloads")
             SettingsCard {
                 SettingsItem(
@@ -111,10 +108,12 @@ fun SettingsScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 val videoOptions = listOf("4K", "1080p", "720p", "480p")
-                                MorphingSegmentedButton(
+                                // Native connected button group (MaterialButtonToggleGroup)
+                                com.example.pulsar.ui.components.ConnectedButtonGroup(
                                     options = videoOptions,
                                     selectedOption = videoQuality,
-                                    onOptionSelect = { viewModel.updateVideoQuality(it) }
+                                    onOptionSelect = { viewModel.updateVideoQuality(it) },
+                                    modifier = Modifier.fillMaxWidth()
                                 )
 
                                 Spacer(modifier = Modifier.height(4.dp))
@@ -126,10 +125,11 @@ fun SettingsScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 val audioOptions = listOf("High (320k)", "Medium (128k)", "Low (64k)")
-                                MorphingSegmentedButton(
+                                com.example.pulsar.ui.components.ConnectedButtonGroup(
                                     options = audioOptions,
                                     selectedOption = audioQuality,
-                                    onOptionSelect = { viewModel.updateAudioQuality(it) }
+                                    onOptionSelect = { viewModel.updateAudioQuality(it) },
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         }
@@ -174,25 +174,12 @@ fun SettingsScreen(
                                     .padding(top = 16.dp)
                             ) {
                                 val options = listOf("Auto", "Light", "Dark")
-                                MorphingSegmentedButton(
+                                // Native connected group for theme selection
+                                com.example.pulsar.ui.components.ConnectedButtonGroup(
                                     options = options,
                                     selectedOption = theme,
-                                    onOptionSelect = { label ->
-                                        viewModel.updateTheme(label)
-                                        // Removed showThemeMenu = false to keep it open
-                                    },
-                                    labelTransformation = { label ->
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            val icon = when (label) {
-                                                "Light" -> Icons.Default.LightMode
-                                                "Dark" -> Icons.Default.DarkMode
-                                                else -> Icons.Default.AutoMode
-                                            }
-                                            Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(label, style = MaterialTheme.typography.labelMedium)
-                                        }
-                                    }
+                                    onOptionSelect = { viewModel.updateTheme(it) },
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         }
@@ -202,14 +189,13 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --- ADVANCED SECTION ---
             SettingsSectionHeader("Advanced")
             SettingsCard {
                 SettingsItem(
                     icon = Icons.Outlined.Terminal,
                     title = "Use aria2c Engine",
                     subtitle = "Enable multi-connection processing",
-                    onClick = { viewModel.updateUseAria2c(!useAria2c) }, // Click entire row to toggle
+                    onClick = { viewModel.updateUseAria2c(!useAria2c) },
                     trailingContent = {
                         Switch(
                             checked = useAria2c,
@@ -410,7 +396,6 @@ fun SettingsCard(
     }
 }
 
-// UPDATED: Now accepts an onClick parameter for entire-row tapping
 @Composable
 fun SettingsItem(
     icon: ImageVector,

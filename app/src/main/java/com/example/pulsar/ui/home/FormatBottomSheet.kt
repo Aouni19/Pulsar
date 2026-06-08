@@ -64,7 +64,6 @@ fun FormatBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Real Data List!
             formats.take(6).forEachIndexed { index, format ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),

@@ -31,12 +31,31 @@ class PulsarApp : Application(), Configuration.Provider {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                YoutubeDL.getInstance().init(this@PulsarApp)
-                FFmpeg.getInstance().init(this@PulsarApp)
-                Aria2c.getInstance().init(this@PulsarApp)
+                // Initialize libraries safely
+                try {
+                    YoutubeDL.getInstance().init(this@PulsarApp)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
 
-                // Update yt-dlp to the latest stable version to prevent YouTube 403 errors and missing formats
-                YoutubeDL.getInstance().updateYoutubeDL(this@PulsarApp, YoutubeDL.UpdateChannel.STABLE)
+                try {
+                    FFmpeg.getInstance().init(this@PulsarApp)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                try {
+                    Aria2c.getInstance().init(this@PulsarApp)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                // Update yt-dlp to the latest stable version (non-blocking, safe to fail)
+                try {
+                    YoutubeDL.getInstance().updateYoutubeDL(this@PulsarApp, YoutubeDL.UpdateChannel.STABLE)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -144,12 +144,32 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = "Recent Downloads",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onBackground
                 )
+                
+                if (recentDownloads.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
+                            .clickable { viewModel.clearRecentDownloads() }
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Clear",
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -160,21 +180,23 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (recentDownloads.isEmpty()) {
-                    item {
+                    item(key = "empty_state") {
                         Text(
                             text = "No recent downloads yet.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 16.dp)
+                            modifier = Modifier.padding(top = 16.dp).animateItem()
                         )
                     }
                 } else {
-                    items(recentDownloads) { item ->
-                        RecentDownloadCard(item, onClick = {
-                            item.filePath?.let { path ->
-                                openFile(context, path)
-                            }
-                        })
+                    items(recentDownloads, key = { it.id }) { item ->
+                        Box(modifier = Modifier.animateItem()) {
+                            RecentDownloadCard(item, onClick = {
+                                item.filePath?.let { path ->
+                                    openFile(context, path)
+                                }
+                            })
+                        }
                     }
                 }
             }
@@ -360,35 +382,64 @@ fun RecentDownloadCard(item: RecentDownloadItem, onClick: () -> Unit) {
                     com.example.pulsar.data.model.DownloadStatus.QUEUED -> "Queued"
                 }
 
-                // M3 Status color mapping
                 val statusColor = when (item.status) {
-                    com.example.pulsar.data.model.DownloadStatus.COMPLETED -> MaterialTheme.colorScheme.primary // M3 Success
-                    com.example.pulsar.data.model.DownloadStatus.DOWNLOADING -> MaterialTheme.colorScheme.secondary
-                    com.example.pulsar.data.model.DownloadStatus.FAILED -> MaterialTheme.colorScheme.error
-                    com.example.pulsar.data.model.DownloadStatus.CANCELLED -> MaterialTheme.colorScheme.onSurfaceVariant
+                    com.example.pulsar.data.model.DownloadStatus.COMPLETED -> Color(0xFF4CAF50) // Prominent Green
+                    com.example.pulsar.data.model.DownloadStatus.DOWNLOADING -> MaterialTheme.colorScheme.primary // Keep Primary for Downloading
+                    com.example.pulsar.data.model.DownloadStatus.FAILED -> MaterialTheme.colorScheme.error // Prominent Red
+                    com.example.pulsar.data.model.DownloadStatus.CANCELLED -> Color(0xFFFF9800) // Prominent Orange
                     com.example.pulsar.data.model.DownloadStatus.QUEUED -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
 
                 Text(
                     text = statusText,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                     color = statusColor,
                     maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // THE TWEAK: Fully rounded pill badge using proper container colors
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = item.quality,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = item.quality,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = item.size,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = item.runtime,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
                 }
             }
         }

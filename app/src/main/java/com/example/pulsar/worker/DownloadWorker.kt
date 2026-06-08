@@ -158,9 +158,17 @@ class DownloadWorker @AssistedInject constructor(
                         }
                         Result.success(workDataOf("FILE_PATH" to finalFile.absolutePath))
                     } else {
+                        // Update DB to FAILED since rename failed
+                        downloadDao.getDownloadByWorkId(id.toString())?.let { record ->
+                            downloadDao.update(record.copy(status = com.example.pulsar.data.model.DownloadStatus.FAILED))
+                        }
                         Result.failure(workDataOf("ERROR" to "Failed to rename file to $finalFileName"))
                     }
                 } else {
+                    // Update DB to FAILED since file wasn't found
+                    downloadDao.getDownloadByWorkId(id.toString())?.let { record ->
+                        downloadDao.update(record.copy(status = com.example.pulsar.data.model.DownloadStatus.FAILED))
+                    }
                     Result.failure(workDataOf("ERROR" to "Could not find downloaded file in directory for id: $id"))
                 }
             } else {

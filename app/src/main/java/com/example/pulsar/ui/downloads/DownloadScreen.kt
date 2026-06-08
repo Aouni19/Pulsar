@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.*
 import androidx.compose.material.icons.filled.Delete
 import kotlinx.coroutines.launch
@@ -54,10 +55,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import java.io.File
 
+import com.example.pulsar.data.model.DownloadStatus
+
 /**
  * Displays the active downloads, showing progress and allowing users to manage or cancel them.
  */
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DownloadsScreen(
     sharedTransitionScope: SharedTransitionScope,
@@ -140,34 +143,39 @@ fun DownloadsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // Display downloaded items
-                items(downloads) { item ->
+                items(downloads, key = { it.id }) { item ->
                     val isSelected = selectedIds.contains(item.id)
-                    ActiveDownloadCard(
-                        title = item.title,
-                        quality = item.quality,
-                        progress = item.progress,
-                        progressText = item.progressText,
-                        statusText = item.statusText,
-                        isPlaying = item.isPlaying,
-                        thumbnailUrl = item.thumbnailUrl,
-                        isQueued = item.isQueued,
-                        isSelected = isSelected,
-                        onCancel = { viewModel.cancelDownload(item.id) }, // Wire up the cancel button
-                        onLongClick = {
-                            if (selectedIds.isEmpty()) {
-                                selectedIds = setOf(item.id)
-                            }
-                        },
-                        onClick = {
-                            if (selectedIds.isNotEmpty()) {
-                                selectedIds = if (isSelected) selectedIds - item.id else selectedIds + item.id
-                            } else {
-                                item.filePath?.let { path ->
-                                    openFile(context, path)
+                    Box(modifier = Modifier.animateItem()) {
+                        ActiveDownloadCard(
+                            title = item.title,
+                            quality = item.quality,
+                            progress = item.progress,
+                            progressText = item.progressText,
+                            statusText = item.statusText,
+                            status = item.status,
+                            isPlaying = item.isPlaying,
+                            thumbnailUrl = item.thumbnailUrl,
+                            isQueued = item.isQueued,
+                            isSelected = isSelected,
+                            onCancel = { 
+                                viewModel.cancelDownload(item.id)
+                            },
+                            onLongClick = {
+                                if (selectedIds.isEmpty()) {
+                                    selectedIds = setOf(item.id)
+                                }
+                            },
+                            onClick = {
+                                if (selectedIds.isNotEmpty()) {
+                                    selectedIds = if (isSelected) selectedIds - item.id else selectedIds + item.id
+                                } else {
+                                    item.filePath?.let { path ->
+                                        openFile(context, path)
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -207,6 +215,7 @@ fun ActiveDownloadCard(
     progress: Float,
     progressText: String,
     statusText: String,
+    status: DownloadStatus,
     isPlaying: Boolean,
     thumbnailUrl: String,
     isQueued: Boolean = false,
@@ -307,10 +316,12 @@ fun ActiveDownloadCard(
 //                            icon = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
 //                            onClick = { /* Toggle Play/Pause */ }
 //                        )
-                        CircularOutlinedButton(
-                            icon = Icons.Default.Close,
-                            onClick = onCancel
-                        )
+                        if (status == DownloadStatus.DOWNLOADING || status == DownloadStatus.QUEUED) {
+                            CircularOutlinedButton(
+                                icon = Icons.Default.Close,
+                                onClick = onCancel
+                            )
+                        }
                     }
                 }
 
@@ -333,14 +344,11 @@ fun ActiveDownloadCard(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 // Progress Bar
-                LinearProgressIndicator(
+                LinearWavyProgressIndicator(
                     progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     color = progressColor,
-                    trackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                    strokeCap = StrokeCap.Round
+                    trackColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))

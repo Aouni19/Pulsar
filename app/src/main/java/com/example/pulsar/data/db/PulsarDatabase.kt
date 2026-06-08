@@ -8,7 +8,7 @@ import com.example.pulsar.data.model.DownloadRecord
 /**
  * The main Room database for the Pulsar application.
  */
-@Database(entities = [DownloadRecord::class], version = 1, exportSchema = false)
+@Database(entities = [DownloadRecord::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class PulsarDatabase : RoomDatabase() {
     abstract fun downloadDao(): DownloadDao

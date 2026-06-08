@@ -52,7 +52,7 @@ Whether you want to save a quick clip, download a full playlist, or extract just
 
 ---
 
-## ✨ Key Features
+## ✨ Key Featuresstill
 
 * **🎥 Universal Downloading:** Fetch video and audio content efficiently using a powerful underlying binary engine.
 * **⚙️ Granular Quality Control:** Choose your exact preferred formats, resolutions, and quality defaults before downloading.
@@ -60,6 +60,24 @@ Whether you want to save a quick clip, download a full playlist, or extract just
 * **🛠️ Advanced Customization:** Pass custom flag arguments to the downloading engine for power-user flexibility.
 * **🌓 Dynamic Theming:** Fully supports Material You dynamic colors along with beautiful custom Dark and Light modes.
 * **⚡ Background Processing:** Reliable background downloads using Android's WorkManager, ensuring your downloads finish even if you leave the app.
+
+---
+
+## 📝 Version History
+
+### [v1.2.0] - Expressive UI & Dynamic Media Cards
+* **Redesigned UI Components**: Replaced standard toggles with a custom Material 3 Expressive `ConnectedButtonGroup` featuring dynamic, morphing pill animations.
+* **Fluid Progress Indicators**: Introduced a custom `LinearWavyProgressIndicator` for a modern, fluid aesthetic during active downloads.
+* **Dynamic Media Info**: The Recent Downloads card now dynamically extracts and displays accurate file sizes and video runtimes directly from the downloaded files.
+* **Status Semantic Coloring**: Applied prominent, state-specific coloring (Green for Completed, Red for Failed, Orange for Cancelled) for immediate visual feedback.
+* **Under-the-hood Polish**: Cleaned up codebase comments, enforced strict type safety, and implemented necessary Android 13+ foreground service permissions for rock-solid background downloading.
+
+### [v1.0.0] - Initial Release
+* **Universal Media Fetching**: Core engine implementation for downloading video and audio from multiple platforms.
+* **Granular Quality Control**: Bottom sheet selectors for choosing exact formats, codecs, and resolutions.
+* **Download Manager**: Real-time tracking of queued, active, and completed downloads via WorkManager.
+* **Dynamic Theming**: Support for Material You and custom light/dark modes.
+* **Advanced Settings**: Introduced Aria2c integration and custom downloader flags for power users.
 
 ---
 

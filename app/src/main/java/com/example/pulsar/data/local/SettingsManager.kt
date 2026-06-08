@@ -59,14 +59,6 @@ class SettingsManager @Inject constructor(@ApplicationContext context: Context) 
     fun getCustomFlags(): String = prefs.getString("CUSTOM_FLAGS", "") ?: ""
     fun setCustomFlags(flags: String) = prefs.edit { putString("CUSTOM_FLAGS", flags) }
 
-    // Deleted Download IDs
-    fun getDeletedDownloadIds(): Set<String> = prefs.getStringSet("DELETED_DOWNLOAD_IDS", emptySet()) ?: emptySet()
-    fun addDeletedDownloadId(id: String) {
-        val current = getDeletedDownloadIds().toMutableSet()
-        current.add(id)
-        prefs.edit { putStringSet("DELETED_DOWNLOAD_IDS", current) }
-    }
-
     // Clear Cache
     fun clearCache(context: Context): Long {
         var deletedSize = 0L
